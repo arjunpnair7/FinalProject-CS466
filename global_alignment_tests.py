@@ -1,11 +1,7 @@
 import unittest
 import global_alignment
-# These are the rewards that the string alignment algorithm uses
-GAP = "-"
-SIMILARITY_THRESHOLD = .50
-SIMILARITY_REWARD = 10
-GAP_PENALTY = -1
-STRING_MISMATCH_PENALTY = -.5
+from Utils import GAP, GAP_PENALTY, SIMILARITY_REWARD, STRING_MISMATCH_PENALTY
+
 
 # Unit test class
 class TestGlobalAlignmentAlgorithm(unittest.TestCase):
@@ -25,8 +21,6 @@ class TestGlobalAlignmentAlgorithm(unittest.TestCase):
         self.assertEqual(global_alignment.string_alignment_reward_function("dog", "water"), STRING_MISMATCH_PENALTY)
         self.assertEqual(global_alignment.string_alignment_reward_function("king", "water"), STRING_MISMATCH_PENALTY)
 
-
-        
 
 
     # Tests to see if the global alignment algorithm is functioning as expected

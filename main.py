@@ -1,53 +1,42 @@
 import pandas as pd
-from knn import KNN
-from gensim.models import KeyedVectors
-
-
-FILE_PATH = 'imdb_top_1000.csv'
-STOP_WORDS = {
-    'a', 'an', 'and', 'are', 'as', 'at', 'be', 'but', 'by',
-    'for', 'if', 'in', 'into', 'is', 'it', 'no', 'not',
-    'of', 'on', 'or', 'such', 'that', 'the', 'their',
-    'then', 'there', 'these', 'they', 'this',
-    'to', 'was', 'will', 'with'
-}
-STOP_WORDS = {}
-DATASET_SIZE = 1000
-TRAININGSET_SIZE = 900
-
-
-model_path = 'GoogleNews-vectors-negative300-SLIM.bin'
-word_vectors = KeyedVectors.load_word2vec_format(model_path, binary=True)
-word_set = set(word_vectors.key_to_index.keys())
+from knn import predict_labels
+from global_alignment import global_alignment
+import Utils
 
 
 
-class MovieEntry:
-    def __init__(self, overview, genre):
-        # Filter out stop words and words not in word_set during initialization
-        self.overview = [word for word in overview.lower().split() if word not in STOP_WORDS and word in word_set]
-        self.genre = [g.strip().lower() for g in genre.split(',')]
-
-    def __str__(self):
-        snippet = ' '.join(self.overview[:10]) + '...' if len(self.overview) > 10 else ' '.join(self.overview)
-        return f'Genre: {self.genre}, Overview: {snippet}'
-
-df = pd.read_csv(FILE_PATH)
-movie_entries = [MovieEntry(row['Overview'], row['Genre']) for _, row in df.iterrows()]
+df = pd.read_csv(Utils.FILE_PATH)
+movie_entries = [Utils.MovieEntry(row['Overview'], row['Genre']) for _, row in df.iterrows()]
 
 
+training_set = []
+training_set_labels = []
 
-training_set = movie_entries[:900]
-test_set = movie_entries[900: 925]
+for i in range(900):
+    training_set.append(movie_entries[i])
+    training_set_labels.append(movie_entries[i].genre)
 
-knn = KNN(training_set, test_set)
-knn.evaluate_performance()
+test_set = []
+test_set_labels = []
+for i in range(900, 905):
+    test_set.append(movie_entries[i])
+    test_set_labels.append(movie_entries[i].genre)
 
-# for entry in movie_entries:
-#     print(entry)
+# Set up an evaluation function for KNN
+def check_genre_match(predicted_label, true_label):
+        for i in range(len(predicted_label)):
+             if predicted_label[i] in true_label:
+                  return 1
+        return 0
+
+# predict_labels returns predicted labels but we do not need it
+# Note: We are passing in global_alignment here as it is the similarity metric we will use
+
+_, accuracy = predict_labels(training_set, training_set_labels, test_set, test_set_labels, global_alignment, check_genre_match, 20)
+
+print("ACCURACY: ", accuracy)
 
 
-# print(len(movie_entries))
 
 
 
