@@ -42,8 +42,7 @@ for k_val in K_values:
 
 print("K Values: ")
 print(K_values, " : ", K_val_accuracies)
-# for i in range(len(K_values)):
-#      print(K_values[i], " : ", K_val_accuracies[i])
+
 
 
 # Uncomment below to test accuracy with various threshold values
